@@ -1,5 +1,236 @@
 <!DOCTYPE html>
-<html lang="fr">
-<head><meta charset="utf-8"><title>Artificiosus</title><meta http-equiv="refresh" content="0; url=privacy.html"></head>
-<body><a href="privacy.html">Artificiosus : politique de confidentialit&eacute; / privacy policy</a></body>
+<html lang="fr" data-l="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Artificiosus · Feux d'artifice en chaîne</title>
+  <meta name="description" content="Roguelike de feux d'artifice en chaîne pour Android, en pixel art. Gratuit, sans pub, hors ligne.">
+  <meta name="theme-color" content="#140a24">
+  <meta property="og:title" content="Artificiosus">
+  <meta property="og:description" content="Touche un feu, il explose et allume ses voisins. Roguelike de feux d'artifice en chaîne, gratuit et sans pub.">
+  <meta property="og:image" content="https://dariool.github.io/artificiosus-site/img/chaine.png">
+  <link rel="icon" href="img/favicon.png" type="image/png">
+  <link rel="preload" href="fonts/Jersey10.ttf" as="font" type="font/ttf" crossorigin>
+  <style>
+    @font-face { font-family: "Pixel"; src: url("fonts/Jersey10.ttf") format("truetype"); font-display: swap; }
+    :root {
+      --night: #140a24; --panel: #2b2142; --edge: #4b3d6e; --inner: #170f28;
+      --gold: #f5c543; --gold-d: #a8821f; --chips: #ff8f2e; --mult: #e0408a; --mult-d: #8f2459;
+      --purple: #9b6cf0; --muted: #b9addb; --cream: #fff3d6;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; background: var(--night); color: #fff; }
+    body { font: 22px/1.15 "Pixel", monospace; -webkit-font-smoothing: none; overflow-x: hidden; }
+    html[data-l="fr"] [lang="en"], html[data-l="en"] [lang="fr"] { display: none !important; }
+    #sky { position: fixed; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; z-index: 0; pointer-events: none; }
+    main { position: relative; z-index: 1; max-width: 860px; margin: 0 auto; padding: 24px 18px 40px; }
+    a { color: var(--gold); }
+
+    .lang { position: absolute; top: 12px; right: 12px; z-index: 2; display: inline-flex; gap: 4px; padding: 3px; border-radius: 9px; background: var(--inner); border: 2px solid var(--edge); }
+    .lang button { font: inherit; font-size: 20px; color: var(--muted); background: none; border: 0; border-radius: 6px; padding: 1px 10px 3px; cursor: pointer; }
+    .lang button.on { background: var(--chips); color: #fff; }
+
+    header { text-align: center; padding: 6vh 0 2vh; }
+    header img { width: 96px; height: 96px; image-rendering: pixelated; }
+    h1 { margin: 18px 0 4px; font-size: min(17vw, 112px); line-height: 1; letter-spacing: 2px; font-weight: 400; white-space: nowrap; }
+    h1 span { display: inline-block; animation: wave 1.6s ease-in-out infinite; color: var(--gold); text-shadow: 0 5px 0 var(--mult-d), 4px 0 0 rgba(255, 143, 46, .6), -4px 0 0 rgba(155, 108, 240, .6); }
+    @keyframes wave { 0%, 100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-7px) rotate(3deg); } }
+    .sub { margin: 10px 0 0; font-size: 30px; color: #fff; text-shadow: 0 2px 0 #000; }
+    .pitch { max-width: 560px; margin: 18px auto 0; font-size: 23px; color: var(--muted); }
+
+    .cta { text-align: center; margin: 30px 0 8px; }
+    .btn { display: inline-block; font: inherit; text-decoration: none; border-radius: 12px; padding: 10px 30px 14px; cursor: pointer; transition: transform .08s; }
+    .btn:active { transform: translateY(4px); }
+    .btn.gold { font-size: 36px; background: var(--gold); color: #3a2400; text-shadow: 0 1px 0 rgba(255, 255, 255, .4); box-shadow: 0 5px 0 var(--gold-d), 0 0 0 4px rgba(245, 197, 67, .15); }
+    .btn.gold:active { box-shadow: 0 1px 0 var(--gold-d); }
+    .btn.kofi { font-size: 24px; background: var(--mult); color: #fff; text-shadow: 0 2px 0 rgba(0, 0, 0, .3); box-shadow: 0 4px 0 var(--mult-d); padding: 6px 20px 9px; }
+    .meta { margin-top: 12px; font-size: 19px; color: var(--muted); }
+    .soon { margin-top: 4px; font-size: 19px; color: var(--chips); }
+
+    .shots { display: flex; justify-content: center; gap: 18px; margin: 46px 0 10px; flex-wrap: wrap; }
+    .shots figure { margin: 0; width: min(240px, 42vw); }
+    .shots img { display: block; width: 100%; border-radius: 18px; border: 4px solid var(--edge); box-shadow: 0 8px 0 #0b0614; background: var(--inner); }
+    .shots figcaption { margin-top: 10px; text-align: center; font-size: 20px; color: var(--muted); }
+    .shots figure:nth-child(2) { transform: translateY(-14px) rotate(1.5deg); }
+    .shots figure:nth-child(1) { transform: rotate(-1.5deg); }
+    .shots figure:nth-child(3) { transform: rotate(1deg); }
+
+    .panel { background: rgba(43, 33, 66, .92); border: 2px solid var(--edge); border-radius: 14px; padding: 6px 22px 18px; margin: 34px 0 0; box-shadow: 0 6px 0 #0b0614; }
+    h2 { margin: 14px 0 8px; font-size: 34px; font-weight: 400; color: var(--cream); }
+    .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin: 6px 0 0; padding: 0; list-style: none; }
+    .facts li { background: var(--inner); border: 2px solid var(--edge); border-radius: 10px; padding: 8px 12px 10px; font-size: 20px; color: var(--muted); }
+    .facts b { display: block; font-size: 34px; font-weight: 400; line-height: 1; }
+    .facts li:nth-child(1) b { color: var(--chips); }
+    .facts li:nth-child(2) b { color: var(--mult); }
+    .facts li:nth-child(3) b { color: var(--purple); }
+    .facts li:nth-child(4) b { color: var(--gold); }
+    ol { margin: 4px 0 0; padding-left: 28px; font-size: 22px; }
+    ol li { margin: 6px 0; }
+    ol li::marker { color: var(--gold); }
+    .note { margin: 12px 0 0; font-size: 19px; color: var(--muted); }
+
+    .dario { display: flex; align-items: center; gap: 18px; }
+    .dario img { width: 104px; height: 104px; image-rendering: pixelated; flex: none; }
+    .dario p { margin: 0 0 12px; font-size: 22px; }
+
+    footer { margin: 40px 0 0; text-align: center; font-size: 19px; color: var(--muted); }
+    footer a { margin: 0 8px; }
+
+    @media (max-width: 520px) {
+      body { font-size: 20px; }
+      .sub { font-size: 26px; }
+      .btn.gold { font-size: 30px; padding: 9px 22px 12px; }
+      .shots { gap: 10px; }
+      .shots figure:nth-child(3) { display: none; }
+      .dario { flex-direction: column; text-align: center; }
+    }
+    @media (prefers-reduced-motion: reduce) { h1 span { animation: none; } }
+  </style>
+</head>
+<body>
+  <canvas id="sky"></canvas>
+  <div class="lang"><button data-set="fr">FR</button><button data-set="en">EN</button></div>
+
+  <main>
+    <header>
+      <img src="img/icone.png" alt="">
+      <h1 aria-label="Artificiosus"></h1>
+      <p class="sub"><span lang="fr">Feux d'artifice en chaîne</span><span lang="en">Chain-reaction fireworks</span></p>
+      <p class="pitch">
+        <span lang="fr">Touche un feu : il explose et allume ses voisins, qui allument les leurs. Huit soirées, des boss, une boutique pour construire ton ciel. Un roguelike en pixel art, à jouer d'une main.</span>
+        <span lang="en">Tap a firework: it bursts and lights its neighbours, which light theirs. Eight nights, bosses, a shop to build your own sky. A pixel-art roguelike you can play with one hand.</span>
+      </p>
+    </header>
+
+    <div class="cta">
+      <a class="btn gold" href="Artificiosus.apk" download>
+        <span lang="fr">Télécharger pour Android</span><span lang="en">Download for Android</span>
+      </a>
+      <div class="meta"><span lang="fr">Version 1.6.0 · APK de 290 Ko · Android 8 ou plus</span><span lang="en">Version 1.6.0 · 290 KB APK · Android 8 or later</span></div>
+      <div class="soon"><span lang="fr">Bientôt sur le Play Store</span><span lang="en">Coming soon to Google Play</span></div>
+    </div>
+
+    <section class="shots">
+      <figure><img src="img/accueil.png" alt="" loading="lazy" width="390" height="844"><figcaption><span lang="fr">Choisis ton sac</span><span lang="en">Pick your bag</span></figcaption></figure>
+      <figure><img src="img/chaine.png" alt="" loading="lazy" width="390" height="844"><figcaption><span lang="fr">Allume, regarde la chaîne</span><span lang="en">Light it, watch it chain</span></figcaption></figure>
+      <figure><img src="img/boutique.png" alt="" loading="lazy" width="390" height="844"><figcaption><span lang="fr">Construis ton ciel</span><span lang="en">Build your sky</span></figcaption></figure>
+    </section>
+
+    <section class="panel">
+      <h2><span lang="fr">Dans la boîte</span><span lang="en">What's inside</span></h2>
+      <ul class="facts">
+        <li><b>13</b><span lang="fr">feux différents</span><span lang="en">kinds of fireworks</span></li>
+        <li><b>13</b><span lang="fr">boss, dont 3 finaux</span><span lang="en">bosses, 3 of them final</span></li>
+        <li><b>8</b><span lang="fr">sacs de départ</span><span lang="en">starting bags</span></li>
+        <li><b>0</b><span lang="fr">pub, compte ou connexion</span><span lang="en">ads, accounts or Internet</span></li>
+      </ul>
+    </section>
+
+    <section class="panel">
+      <h2><span lang="fr">Installer l'APK</span><span lang="en">Installing the APK</span></h2>
+      <ol>
+        <li><span lang="fr">Ouvre cette page sur ton téléphone Android et touche « Télécharger ».</span><span lang="en">Open this page on your Android phone and tap "Download".</span></li>
+        <li><span lang="fr">Ouvre le fichier téléchargé. Android demande d'autoriser ton navigateur à installer des applis : accepte.</span><span lang="en">Open the downloaded file. Android asks you to let your browser install apps: allow it.</span></li>
+        <li><span lang="fr">Touche « Installer », puis lance Artificiosus.</span><span lang="en">Tap "Install", then launch Artificiosus.</span></li>
+      </ol>
+      <p class="note">
+        <span lang="fr">Pour une nouvelle version, retélécharge l'APK ici : ta progression est gardée. Le jeu ne demande aucune permission, à part le vibreur.</span>
+        <span lang="en">For a new version, download the APK again here: your progress is kept. The game asks for no permissions, apart from vibration.</span>
+      </p>
+    </section>
+
+    <section class="panel dario">
+      <img src="img/dario.png" alt="Dario">
+      <div>
+        <h2><span lang="fr">Fait par Dario</span><span lang="en">Made by Dario</span></h2>
+        <p><span lang="fr">Artificiosus est gratuit et sans pub. Si le jeu te plaît, tu peux m'offrir un café : ça ne débloque rien dans le jeu, c'est juste un merci.</span><span lang="en">Artificiosus is free, with no ads. If you enjoy it, you can buy me a coffee: it unlocks nothing in the game, it's just a thank-you.</span></p>
+        <a class="btn kofi" href="https://ko-fi.com/darioolibet" target="_blank" rel="noopener"><span lang="fr">Offrir un café</span><span lang="en">Buy me a coffee</span></a>
+      </div>
+    </section>
+
+    <footer>
+      <a href="privacy.html"><span lang="fr">Confidentialité</span><span lang="en">Privacy</span></a>·<a href="mailto:dario.olibet@gmail.com">Contact</a>
+      <p><span lang="fr">Police Jersey 10, sous licence</span><span lang="en">Jersey 10 font, under the</span> <a href="fonts/OFL.txt">SIL OFL 1.1</a> · © 2026 Dario Olibet</p>
+    </footer>
+  </main>
+
+  <script>
+    // Langue : celle du navigateur, puis celle choisie.
+    const root = document.documentElement;
+    function setLang(l) {
+      root.dataset.l = l;
+      root.lang = l;
+      for (const b of document.querySelectorAll('.lang button')) b.classList.toggle('on', b.dataset.set === l);
+      try { localStorage.setItem('as-lang', l); } catch (e) {}
+    }
+    let saved = null;
+    try { saved = localStorage.getItem('as-lang'); } catch (e) {}
+    setLang(saved || ((navigator.language || 'fr').startsWith('fr') ? 'fr' : 'en'));
+    for (const b of document.querySelectorAll('.lang button')) b.addEventListener('click', () => setLang(b.dataset.set));
+
+    document.querySelector('h1').innerHTML = [...'ARTIFICIOSUS'].map((c, i) => `<span style="animation-delay:${-i * 0.12}s">${c}</span>`).join('');
+
+    // Ciel : étoiles et fusées en gros pixels, dessinés en basse résolution puis agrandis sans lissage.
+    const cv = document.getElementById('sky'), g = cv.getContext('2d');
+    const P = 4, COLORS = ['#ff4d5e', '#4db8ff', '#5be37d', '#ffd23f', '#c08bff', '#ff7ad9', '#ff9a2e', '#3fe0d0', '#f5c543'];
+    const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let W = 0, H = 0, stars = [], rockets = [], sparks = [], last = 0, next = 0;
+    function resize() {
+      W = cv.width = Math.ceil(innerWidth / P);
+      H = cv.height = Math.ceil(innerHeight / P);
+      stars = Array.from({ length: Math.round(W * H / 260) }, () => ({ x: Math.random() * W | 0, y: Math.random() * H | 0, a: .3 + Math.random() * .5, t: Math.random() * 6, s: .3 + Math.random() * .6 }));
+    }
+    function launch() {
+      rockets.push({ x: W * (.1 + Math.random() * .8), y: H, vy: -(H * (.9 + Math.random() * .35)), top: H * (.12 + Math.random() * .35), c: COLORS[Math.random() * COLORS.length | 0] });
+    }
+    function burst(r) {
+      const n = 26 + (Math.random() * 18 | 0), c2 = Math.random() < .35 ? COLORS[Math.random() * COLORS.length | 0] : r.c;
+      for (let i = 0; i < n; i++) {
+        const a = i / n * Math.PI * 2, v = (14 + Math.random() * 10) * (i % 2 ? 1 : .7);
+        sparks.push({ x: r.x, y: r.y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: 0, max: 1.1 + Math.random() * .7, c: i % 3 ? r.c : c2 });
+      }
+    }
+    function frame(t) {
+      const dt = Math.min(.05, (t - last) / 1000 || 0);
+      last = t;
+      g.fillStyle = '#140a24';
+      g.fillRect(0, 0, W, H);
+      for (const s of stars) {
+        g.globalAlpha = s.a * (.65 + .35 * Math.sin(t / 1000 * s.s + s.t));
+        g.fillStyle = '#fff';
+        g.fillRect(s.x, s.y, 1, 1);
+      }
+      g.globalAlpha = 1;
+      if (!calm && t > next) { launch(); next = t + 900 + Math.random() * 1600; }
+      for (const r of rockets) {
+        r.y += r.vy * dt;
+        g.fillStyle = '#fff3d6';
+        g.fillRect(r.x | 0, r.y | 0, 1, 2);
+        g.fillStyle = r.c;
+        g.fillRect(r.x | 0, (r.y | 0) + 2, 1, 2);
+        if (r.y <= r.top) { r.done = true; burst(r); }
+      }
+      rockets = rockets.filter(r => !r.done);
+      for (const p of sparks) {
+        p.life += dt;
+        p.vy += 16 * dt;
+        p.vx *= 1 - 1.4 * dt;
+        p.vy *= 1 - 1.4 * dt;
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        const k = 1 - p.life / p.max;
+        if (k <= 0) continue;
+        g.globalAlpha = k > .3 ? 1 : k / .3;
+        g.fillStyle = p.life < .12 ? '#fff' : p.c;
+        g.fillRect(p.x | 0, p.y | 0, 1, 1);
+      }
+      g.globalAlpha = 1;
+      sparks = sparks.filter(p => p.life < p.max);
+      if (!calm) requestAnimationFrame(frame);
+    }
+    resize();
+    addEventListener('resize', resize);
+    requestAnimationFrame(frame);
+  </script>
+</body>
 </html>

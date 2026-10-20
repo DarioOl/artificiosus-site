@@ -43,6 +43,9 @@
     .btn:active { transform: translateY(4px); }
     .btn.gold { font-size: 36px; background: var(--gold); color: #3a2400; text-shadow: 0 1px 0 rgba(255, 255, 255, .4); box-shadow: 0 5px 0 var(--gold-d), 0 0 0 4px rgba(245, 197, 67, .15); }
     .btn.gold:active { box-shadow: 0 1px 0 var(--gold-d); }
+    .cta .row { display: flex; flex-wrap: wrap; gap: 18px; justify-content: center; align-items: center; }
+    .btn.apk { font-size: 26px; background: var(--purple); color: #fff; text-shadow: 0 2px 0 rgba(0, 0, 0, .3); box-shadow: 0 5px 0 #5d3fa3; padding: 8px 22px 11px; }
+    .btn.apk:active { box-shadow: 0 1px 0 #5d3fa3; }
     .btn.kofi { font-size: 24px; background: var(--mult); color: #fff; text-shadow: 0 2px 0 rgba(0, 0, 0, .3); box-shadow: 0 4px 0 var(--mult-d); padding: 6px 20px 9px; }
     .meta { margin-top: 12px; font-size: 19px; color: var(--muted); }
     .soon { margin-top: 4px; font-size: 19px; color: var(--chips); }
@@ -80,6 +83,7 @@
       body { font-size: 20px; }
       .sub { font-size: 26px; }
       .btn.gold { font-size: 30px; padding: 9px 22px 12px; }
+      .btn.apk { font-size: 23px; }
       .shots { gap: 10px; }
       .shots figure:nth-child(3) { display: none; }
       .dario { flex-direction: column; text-align: center; }
@@ -103,10 +107,15 @@
     </header>
 
     <div class="cta">
-      <a class="btn gold" href="https://github.com/DarioOl/artificiosus-site/releases/latest/download/Artificiosus.apk" data-goatcounter-click="telecharger-apk" data-goatcounter-title="Télécharger l'APK">
-        <span lang="fr">Télécharger pour Android</span><span lang="en">Download for Android</span>
-      </a>
-      <div class="meta"><span lang="fr">Version 1.6.0 · APK de 290 Ko · Android 8 ou plus</span><span lang="en">Version 1.6.0 · 290 KB APK · Android 8 or later</span></div>
+      <div class="row">
+        <a class="btn gold" href="play/" data-goatcounter-click="jouer-navigateur" data-goatcounter-title="Jouer dans le navigateur">
+          <span lang="fr">Jouer dans le navigateur</span><span lang="en">Play in your browser</span>
+        </a>
+        <a class="btn apk" href="https://github.com/DarioOl/artificiosus-site/releases/latest/download/Artificiosus.apk" data-goatcounter-click="telecharger-apk" data-goatcounter-title="Télécharger l'APK">
+          <span lang="fr">Télécharger pour Android</span><span lang="en">Download for Android</span>
+        </a>
+      </div>
+      <div class="meta"><span lang="fr">Dans le navigateur : rien à installer, sur téléphone ou ordinateur · APK 1.6.0 de 290 Ko, Android 8 ou plus</span><span lang="en">In the browser: nothing to install, on phone or computer · APK 1.6.0, 290 KB, Android 8 or later</span></div>
       <div class="soon"><span lang="fr">Bientôt sur le Play Store</span><span lang="en">Coming soon to Google Play</span></div>
     </div>
 

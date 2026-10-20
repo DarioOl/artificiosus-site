@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#140a24">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Artificiosus">
+  <title>Artificiosus</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/favicon.png" type="image/png">
+  <link rel="apple-touch-icon" href="icons/apple-180.png">
+  <link rel="preload" href="fonts/Jersey10.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="at-home">
+  <canvas id="bg"></canvas>
+
+  <div id="app">
+    <header id="top" class="panel-box">
+      <div class="row stats">
+        <div class="box"><small data-i18n="hud.round"></small><b id="round">1/8</b></div>
+        <div class="box target"><small data-i18n="hud.target"></small><b id="target">0</b></div>
+        <div class="box shots"><small data-i18n="hud.shots"></small><b id="shots">0</b></div>
+        <div class="box money"><small data-i18n="hud.money"></small><b id="money">0</b></div>
+        <button id="btn-menu" class="mini burger" aria-label="Menu"><i></i><i></i><i></i></button>
+      </div>
+      <div class="box score"><small data-i18n="hud.score"></small><b id="score">0</b><div class="bar"><div id="bar-fill"></div></div></div>
+      <div class="calc">
+        <div class="chips"><b id="chips">0</b><small data-i18n="hud.points"></small></div>
+        <span class="fuse"><i></i><span class="times">×</span></span>
+        <div class="mult"><b id="mult">0</b><small data-i18n="hud.fireworks"></small></div>
+      </div>
+      <div id="boss" class="hidden"></div>
+    </header>
+
+    <div id="field-wrap">
+      <canvas id="field"></canvas>
+      <div id="toast" class="hidden"></div>
+    </div>
+
+    <footer id="bottom" class="panel-box">
+      <div id="hint"></div>
+      <button id="btn-nudge" class="nudge hidden" type="button">3</button>
+      <div id="tools"></div>
+      <button id="btn-arsenal" class="arsenal-btn"><span class="fan"></span><b data-i18n="arsenal"></b><em id="arsenal-count">0</em></button>
+    </footer>
+  </div>
+
+  <div id="home" class="screen">
+    <canvas id="home-fx"></canvas>
+    <div class="home-inner">
+      <div class="lang"><button data-lang="fr">FR</button><button data-lang="en">EN</button></div>
+      <h1 id="title"></h1>
+      <p class="sub" data-i18n="subtitle"></p>
+      <p id="demo-tag" class="demo-tag hidden"></p>
+      <div class="home-buttons">
+        <button id="btn-resume" class="btn green big hidden"></button>
+        <button id="sac-open" class="pick sac hidden"><span id="sac-icon" class="pick-icon"></span><span class="pick-txt"><b id="sac-name"></b><small id="sac-desc"></small></span></button>
+        <div id="calibre" class="pick cal hidden">
+          <span class="pick-txt"><b id="cal-name"></b><small id="cal-desc"></small></span>
+          <span id="cal-shells" class="cal-shells"></span>
+        </div>
+        <button id="btn-play" class="btn red big" data-i18n="home.play"></button>
+        <div class="row">
+          <button id="btn-defis" class="btn blue"><span data-i18n="home.defis"></span><em></em><i></i></button>
+          <button id="btn-succes" class="btn purple"><span data-i18n="home.succes"></span><em></em><i></i></button>
+        </div>
+        <div class="row">
+          <button id="btn-howto" class="btn grey" data-i18n="home.rules"></button>
+          <button id="btn-stats" class="btn grey" data-i18n="home.stats"></button>
+          <button id="btn-options" class="btn grey" data-i18n="home.options"></button>
+        </div>
+      </div>
+      <p id="record"></p>
+      <a id="btn-tip" class="tip hidden" target="_blank" rel="noopener">
+        <svg viewBox="0 0 10 9" aria-hidden="true">
+          <path fill="#b9addb" d="M3 0h1v1H3zM4 1h1v1H4zM3 2h1v1H3zM6 0h1v1H6zM5 1h1v1H5zM6 2h1v1H6z"/>
+          <path fill="#ffe9b0" d="M1 3h7v4H1zM8 4h2v1H8zM9 5h1v1H9zM8 6h1v1H8z"/>
+          <path fill="#6b3a1e" d="M2 3h5v1H2z"/>
+          <path fill="#c98a4b" d="M0 8h10v1H0zM1 7h7v1H1z"/>
+        </svg>
+        <span data-i18n="home.tip"></span>
+      </a>
+    </div>
+  </div>
+
+  <div id="howto" class="overlay hidden">
+    <div class="panel">
+      <p id="tuto-step"></p>
+      <h2 id="tuto-title"></h2>
+      <div id="tuto-dots"></div>
+      <div id="tuto-page" class="scroll"></div>
+      <p id="tuto-read" class="hidden"></p>
+      <div class="row tuto-nav">
+        <button id="tuto-back" class="btn grey js-back"></button>
+        <button id="tuto-prev" class="btn grey" aria-label="&lt;">&lt;</button>
+        <button id="tuto-next" class="btn gold"></button>
+      </div>
+    </div>
+  </div>
+
+  <div id="recap" class="overlay hidden">
+    <div class="panel">
+      <h2 id="recap-title"></h2>
+      <div class="recap-score">
+        <b id="recap-score">0</b><small id="recap-target"></small>
+        <div class="bar"><div id="recap-bar"></div></div>
+      </div>
+      <div class="recap-body">
+        <div id="recap-money" class="hidden">
+          <h3 data-i18n="recap.money"></h3>
+          <div id="recap-income" class="lines"></div>
+        </div>
+        <div id="recap-run" class="hidden">
+          <h3 data-i18n="run.title"></h3>
+          <div id="recap-stats" class="lines"></div>
+        </div>
+      </div>
+      <div class="recap-actions">
+        <button id="btn-cashout" class="btn gold hidden"></button>
+        <button id="btn-endless" class="btn purple hidden" data-i18n="recap.endless"></button>
+        <button id="btn-again" class="btn red hidden" data-i18n="again"></button>
+        <a id="btn-demo" class="btn gold hidden" data-i18n="demo.get"></a>
+        <button id="btn-recap-home" class="btn grey hidden" data-i18n="menu.home"></button>
+        <p id="recap-skip" data-i18n="recap.skip"></p>
+      </div>
+    </div>
+  </div>
+
+  <div id="shop-screen" class="overlay hidden">
+    <div class="panel">
+      <div class="shop-head">
+        <h2 data-i18n="shop.title"></h2>
+        <div class="purse"><small data-i18n="shop.money"></small><b id="purse">0</b></div>
+        <button class="arsenal-btn js-arsenal"><span class="fan"></span><b data-i18n="arsenal"></b></button>
+      </div>
+      <div id="shop-boss" class="hidden"></div>
+      <div id="shop">
+        <h3 data-i18n="shop.stall"></h3>
+        <div id="shop-cards" class="shelf"></div>
+        <h3 data-i18n="shop.packs"></h3>
+        <div id="shop-packs" class="shelf"></div>
+      </div>
+      <div id="shop-info" class="info"></div>
+      <button id="btn-skip" class="skip hidden"></button>
+      <div class="row shop-actions">
+        <button id="btn-reroll" class="btn green"></button>
+        <button id="btn-next" class="btn red" data-i18n="next"></button>
+      </div>
+    </div>
+  </div>
+
+  <div id="arsenal" class="overlay hidden">
+    <div class="panel">
+      <h2 id="arsenal-title"></h2>
+      <div class="arsenal-body">
+        <h3 data-i18n="arsenal.feux"></h3>
+        <div id="arsenal-feux"></div>
+        <h3><span data-i18n="arsenal.perks"></span> <small id="arsenal-slots"></small></h3>
+        <div id="arsenal-perks"></div>
+        <h3 data-i18n="arsenal.tools"></h3>
+        <div id="arsenal-tools"></div>
+      </div>
+      <button class="btn grey js-back" data-i18n="back"></button>
+    </div>
+  </div>
+
+  <div id="collection" class="overlay hidden">
+    <div class="panel">
+      <h2 data-i18n="coll.title"></h2>
+      <p id="coll-count"></p>
+      <div id="coll-tabs" class="tabs"></div>
+      <div id="coll-list"></div>
+      <button class="btn grey js-back" data-i18n="back"></button>
+    </div>
+  </div>
+
+  <div id="succes" class="overlay hidden">
+    <div class="panel">
+      <h2 data-i18n="succes.title"></h2>
+      <p id="succes-count"></p>
+      <div id="succes-list"></div>
+      <button class="btn grey js-back" data-i18n="back"></button>
+    </div>
+  </div>
+
+  <div id="pack" class="hidden">
+    <canvas id="pack-fx"></canvas>
+    <div class="pack-inner">
+      <div class="pack-top">
+        <div id="pack-owned"></div>
+        <button type="button" class="arsenal-btn js-arsenal"><span class="fan"></span><b data-i18n="arsenal"></b></button>
+      </div>
+      <h2 id="pack-title"></h2>
+      <p id="pack-sub"></p>
+      <div id="pack-stage">
+        <div id="pack-box"></div>
+        <div id="pack-cards"></div>
+      </div>
+      <div id="pack-info" class="info"></div>
+      <button id="pack-skip" class="btn grey"></button>
+    </div>
+  </div>
+
+  <div id="sacs" class="overlay hidden">
+    <div class="panel">
+      <h2 data-i18n="sacs.title"></h2>
+      <p class="sub" data-i18n="sacs.sub"></p>
+      <div id="sacs-list" class="scroll"></div>
+      <button class="btn grey js-back" data-i18n="back"></button>
+    </div>
+  </div>
+
+  <div id="stats" class="overlay hidden">
+    <div class="panel">
+      <h2 data-i18n="stats.title"></h2>
+      <div id="stats-list" class="lines scroll"></div>
+      <button class="btn grey js-back" data-i18n="back"></button>
+    </div>
+  </div>
+
+  <div id="party" class="hidden"><canvas id="party-fx"></canvas><b id="party-text"></b></div>
+  <div id="unlock" class="hidden"></div>
+
+  <div id="menu" class="overlay hidden">
+    <div class="panel">
+      <h2 id="menu-title"></h2>
+      <button id="m-resume" class="btn blue" data-i18n="menu.resume"></button>
+      <div class="toggles">
+        <button id="m-music" class="tog"><em data-i18n="menu.music"></em><span></span></button>
+        <button id="m-sfx" class="tog"><em data-i18n="menu.sfx"></em><span></span></button>
+        <button id="m-vib" class="tog"><em data-i18n="menu.vib"></em><span></span></button>
+        <button id="m-fx" class="tog"><em data-i18n="menu.fx"></em><span></span></button>
+        <button id="m-cb" class="tog"><em data-i18n="menu.cb"></em><span></span></button>
+        <div class="tog lang-row"><em data-i18n="menu.lang"></em><div class="lang"><button data-lang="fr">FR</button><button data-lang="en">EN</button></div></div>
+      </div>
+      <button id="m-rules" class="btn grey" data-i18n="menu.rules"></button>
+      <a id="m-feedback" class="btn grey" target="_blank" rel="noopener" data-i18n="menu.feedback"></a>
+      <button id="m-credits" class="btn grey" data-i18n="menu.credits"></button>
+      <button id="m-restart" class="btn orange"></button>
+      <button id="m-home" class="btn red"></button>
+    </div>
+  </div>
+
+  <div id="credits" class="overlay hidden">
+    <div class="panel">
+      <h2 data-i18n="credits.title"></h2>
+      <div class="credits scroll">
+        <h3 data-i18n="credits.by"></h3>
+        <p>Dario Olibet</p>
+        <h3 data-i18n="credits.music"></h3>
+        <p data-i18n="credits.musicDesc"></p>
+        <h3 data-i18n="credits.font"></h3>
+        <p data-i18n="credits.fontDesc"></p>
+        <h3 data-i18n="credits.privacy"></h3>
+        <p data-i18n="credits.privacyDesc"></p>
+        <p><a href="https://dariool.github.io/artificiosus-site/privacy.html" target="_blank" rel="noopener" data-i18n="credits.privacyLink"></a></p>
+        <h3 data-i18n="credits.contact"></h3>
+        <p><a href="mailto:dario.olibet@gmail.com">dario.olibet@gmail.com</a></p>
+        <p id="credits-version" class="version"></p>
+      </div>
+      <button class="btn grey js-back" data-i18n="back"></button>
+    </div>
+  </div>
+
+  <div id="rotate"><p data-i18n="rotate"></p></div>
+  <div id="crt"></div>
+
+  <script>window.DEMO = 3;</script>
+  <script src="native.js"></script>
+  <script src="i18n.js"></script>
+  <script src="rules.js"></script>
+  <script src="meta.js"></script>
+  <script src="audio.js"></script>
+  <script src="bg.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>

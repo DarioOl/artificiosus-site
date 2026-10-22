@@ -49,7 +49,7 @@
   }
   // rings : ondes de choc ; pops : coques qui gonflent et blanchissent en éclatant ; tint : lueur de la couleur du dernier feu.
   // rockets / sky : fusées tirées dans le ciel derrière la grille et leurs étincelles.
-  const fx = { particles: [], links: [], texts: [], meteors: [], rings: [], pops: [], rockets: [], sky: [], flash: 0, tint: '#ffffff', tintA: 0, cheer: 0, cheerText: '' };
+  const fx = { particles: [], links: [], texts: [], meteors: [], rings: [], pops: [], rockets: [], sky: [], lights: [], flash: 0, tint: '#ffffff', tintA: 0, cheer: 0, cheerText: '' };
   // Arrêt sur image : quelques centièmes de seconde figés sur les gros moments.
   let hitstop = 0;
   const freeze = ms => { if (!calm) hitstop = Math.max(hitstop, ms / 1000); };
@@ -364,6 +364,18 @@
   });
   const SHADOW = sprite(22, g => disc(g, 22, 10.6, 'rgba(0, 0, 0, .45)'));
   const WHITE_DISC = sprite(22, g => disc(g, 22, 10.6, '#ffffff'));
+  // Reflet des explosions sur les coques voisines : pour 16 directions, les pixels du bord tournés vers la lumière
+  // (juste à l'intérieur du contour) et un point d'éclat.
+  const RIM_DIRS = 16;
+  const RIM = [];
+  for (let i = 0; i < RIM_DIRS; i++) {
+    const a = (i / RIM_DIRS) * Math.PI * 2, ux = Math.cos(a), uy = Math.sin(a), px = [];
+    for (let y = 0; y < 22; y++) for (let x = 0; x < 22; x++) {
+      const dx = x + 0.5 - 11, dy = y + 0.5 - 11, d = Math.hypot(dx, dy);
+      if (d > 7.6 && d <= 9.2 && (dx * ux + dy * uy) / d > 0.6) px.push(x, y);
+    }
+    RIM.push({ px, gx: Math.floor(11 + ux * 5.5), gy: Math.floor(11 + uy * 5.5) });
+  }
   const ring = (color, r0, r1) => sprite(30, g => {
     g.fillStyle = color;
     for (let y = 0; y < 30; y++) for (let x = 0; x < 30; x++) {
@@ -888,6 +900,11 @@
 
   function cellCenter(x, y) { return { x: GX + x * CELL + CELL / 2, y: GY + y * CELL + CELL / 2 }; }
 
+  function addLight(x, y, color, power, max) {
+    if (calm || fx.lights.length >= 48) return;
+    fx.lights.push({ x, y, power, max, life: 0, color: css(mix(rgb(color), [255, 255, 255], 0.35)) });
+  }
+
   function explode(f, stepN) {
     const c = st.grid[f.y][f.x];
     // Un double ne disparaît qu'à sa dernière explosion.
@@ -904,6 +921,7 @@
     for (let i = 0; i < 4; i++) fx.particles.push({ x: p.x, y: p.y, vx: (Math.random() - 0.5) * 50, vy: (Math.random() - 0.5) * 50, life: 0, max: 0.3, color: '#ffffff', size: 2 });
     for (let i = 0; i < 3; i++) fx.particles.push({ x: p.x + (Math.random() - 0.5) * 16, y: p.y, vx: (Math.random() - 0.5) * 24, vy: -30 - Math.random() * 30, life: 0, max: 1 + Math.random() * 0.6, color: Math.random() < 0.5 ? GOLD : '#ff7a1a', size: 1, ember: true });
     fx.pops.push({ x: p.x, y: p.y, type: f.type, wet: c.wet, life: 0, max: 0.16 });
+    addLight(p.x, p.y, color, 1, 0.5);
     shock(p.x, p.y, color, 12, 44 + Math.min(20, stepN * 2), 0.34);
     fx.tint = color;
     fx.tintA = Math.min(1, fx.tintA + 0.18);
@@ -2030,6 +2048,32 @@
     b.drawImage(img, art(lx) - (w >> 1) + (ox || 0), top + (oy || 0), w, h);
   }
 
+  // La coque prend la couleur de l'explosion la plus forte autour d'elle, sur le bord tourné vers elle.
+  const LIGHT_REACH = CELL * 3;
+  function rimLight(p, ox, oy) {
+    let best = null, bi = 0;
+    for (const l of fx.lights) {
+      const d = Math.hypot(l.x - p.x, l.y - p.y);
+      if (d < 4 || d > LIGHT_REACH) continue;
+      const k = 1 - l.life / l.max, i = l.power * k ** 1.5 * (1 - d / LIGHT_REACH) ** 0.6;
+      if (i > bi) { bi = i; best = l; }
+    }
+    if (bi < 0.05) return;
+    const a = Math.atan2(best.y - p.y, best.x - p.x);
+    const r = RIM[(Math.round(a / (Math.PI * 2) * RIM_DIRS) + RIM_DIRS) % RIM_DIRS];
+    const x0 = art(p.x) - 11 + ox, y0 = art(p.y) - 11 + oy;
+    b.globalCompositeOperation = 'lighter';
+    b.globalAlpha = Math.min(1, bi * 1.8);
+    b.fillStyle = best.color;
+    for (let j = 0; j < r.px.length; j += 2) b.fillRect(x0 + r.px[j], y0 + r.px[j + 1], 1, 1);
+    if (bi > 0.35) {
+      b.fillStyle = '#ffffff';
+      b.fillRect(x0 + r.gx, y0 + r.gy, 1, 1);
+    }
+    b.globalAlpha = 1;
+    b.globalCompositeOperation = 'source-over';
+  }
+
   // Renfort, Vent, Éteignoir et outils à feux spéciaux : la zone qui va changer, avant le second toucher.
   function drawToolAim(t) {
     const a = st.tool.aim;
@@ -2322,6 +2366,7 @@
           blitScaled(WHITE_DISC, p.x, p.y, shiver, bob, 1 + 0.12 * nextK, 1 + 0.12 * nextK);
         }
         b.globalAlpha = 1;
+        if (fx.lights.length && !hidden && !soon && !(c.land && !calm)) rimLight(p, jit + quiver, bob + lift);
         if (!hidden && c.ed) {
           if (c.ed === 'dore') blit(HALO_GOLD, p.x, p.y, jit, bob + lift);
           if (c.ed === 'brillant') {
@@ -2538,6 +2583,8 @@
     fx.rings = fx.rings.filter(r => r.life < r.max);
     for (const p of fx.pops) p.life += dt;
     fx.pops = fx.pops.filter(p => p.life < p.max);
+    for (const l of fx.lights) l.life += dt;
+    fx.lights = fx.lights.filter(l => l.life < l.max);
     fx.tintA = Math.max(0, fx.tintA - dt * 2.5);
     fx.particles = fx.particles.filter(p => p.life < p.max);
     for (const m of fx.meteors) {
@@ -2561,6 +2608,7 @@
       if (r.y <= r.top) {
         r.done = true;
         A.sky(r.big);
+        addLight(r.x, r.y, r.color, r.big ? 0.9 : 0.6, 0.7);
         const n = (r.big ? 46 : 28) + Math.floor(Math.random() * 12), sp = (r.big ? 120 : 75) + Math.random() * 40;
         for (let i = 0; i < n; i++) {
           const a = (i / n) * Math.PI * 2, v = sp * (0.6 + Math.random() * 0.5);
@@ -4026,7 +4074,7 @@
   showHome();
   startIntro();
   requestAnimationFrame(frame);
-  window.__game = { st, R, M, mods, showRecap, openShop, loadRun, resumeRun, updateHud };
+  window.__game = { st, R, M, fx, mods, showRecap, openShop, loadRun, resumeRun, updateHud, addLight };
 
   // Bouton retour d'Android : ferme l'écran ouvert, sinon met la partie en pause. false : l'appli passe en arrière-plan.
   window.__androidBack = () => {

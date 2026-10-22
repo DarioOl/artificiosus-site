@@ -1,5 +1,5 @@
 // Cache hors ligne. Réseau d'abord (on reçoit toujours la dernière version), le cache sert quand il n'y a pas de réseau.
-const CACHE = 'artificiosus-v64';
+const CACHE = 'artificiosus-v65';
 const FILES = [
   './', 'index.html', 'style.css', 'native.js', 'i18n.js', 'rules.js', 'meta.js', 'audio.js', 'bg.js', 'game.js',
   'manifest.webmanifest', 'fonts/Jersey10.ttf', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/favicon.png',
